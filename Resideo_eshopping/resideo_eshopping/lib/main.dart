@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:resideo_eshopping/pages/productsListPage.dart';
+import 'package:resideo_eshopping/pages/product_List_Page.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       //home: MyHomePage(title: 'Resideo e-Shopping'),
-      home: ProductsListPage(title: 'Resideo e-Shopping'),
+      home: ProductListPage(title: 'Resideo e-Shopping'),
     );
   }
 }
