@@ -10,11 +10,12 @@ class ProductsTile extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     children: <Widget>[
       Card(
+        //color: Color.fromRGBO(255, 255, 255, 0.1),
         child: ListTile(
           isThreeLine: true,
           title: Text(_products.productName),
           subtitle: //Text(_products.shortDescription),
-          
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[

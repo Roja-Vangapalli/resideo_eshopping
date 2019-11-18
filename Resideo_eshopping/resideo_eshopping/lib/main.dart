@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
       title: 'Resideo e-Shopping',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+      
       ),
       //home: MyHomePage(title: 'Resideo e-Shopping'),
       home: ProductListPage(title: 'Resideo e-Shopping'),
