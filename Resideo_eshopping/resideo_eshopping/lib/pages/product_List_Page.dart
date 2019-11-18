@@ -13,11 +13,14 @@ class ProductListPage extends StatefulWidget {
   _ProductListPageState createState() => _ProductListPageState();
 }
 
-class _ProductListPageState extends State<ProductListPage>{
+class _ProductListPageState extends State<ProductListPage> with SingleTickerProviderStateMixin{
 
   ScrollController _scrollController = ScrollController();
 
   List<Product> _products = <Product>[];
+
+  AnimationController controller;
+  Animation<double> animation;
 
   @override 
   Widget build(BuildContext context){
@@ -67,10 +70,17 @@ class _ProductListPageState extends State<ProductListPage>{
     );
   }
 
+
   @override 
   void initState() {
     super.initState();
     listenForProducts();
+    controller = AnimationController(
+      duration: const Duration(milliseconds: 10000), 
+      vsync: this
+    );
+    animation = Tween(begin: 0.0, end: 20.0).animate(controller);
+    controller.repeat();
     _scrollController.addListener(() {
     });
   }
@@ -78,6 +88,7 @@ class _ProductListPageState extends State<ProductListPage>{
   @override 
   void dispose(){
     _scrollController.dispose();
+    controller.dispose();
     super.dispose();
   }
 
@@ -92,7 +103,7 @@ class _ProductListPageState extends State<ProductListPage>{
   preferredSize: Size(double.infinity, 4.0),
     child: SizedBox(
       height: 4.0,
-      child: LinearProgressIndicator()
+      child: LinearProgressIndicator(value: animation.value,)
     )
   );
 
