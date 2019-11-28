@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:resideo_eshopping/Screens/product_list_page.dart';
+import 'package:resideo_eshopping/Screens/signup.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -11,8 +12,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      //home: MyHomePage(title: 'Resideo e-Shopping'),
-      home: ProductsListPage(title: 'Resideo e-Shopping'),
+      home: SignUp(),
+      //home: ProductsListPage(title: 'Resideo e-Shopping'),
     );
   }
 }
