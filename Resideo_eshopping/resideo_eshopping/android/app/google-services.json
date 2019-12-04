@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "967063483053",
+    "firebase_url": "https://resideo-e-shopping.firebaseio.com",
+    "project_id": "resideo-e-shopping",
+    "storage_bucket": "resideo-e-shopping.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:967063483053:android:d00ccd51344c6b04340c24",
+        "android_client_info": {
+          "package_name": "com.resideo.resideo_eshopping"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "967063483053-qquldmtunln36pmg8p28b5rsrl3g00hs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAb4zXlpWmzkt4xdDLqXBM_XpOMysbURHk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "967063483053-qquldmtunln36pmg8p28b5rsrl3g00hs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
