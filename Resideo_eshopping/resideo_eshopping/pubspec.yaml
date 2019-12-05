@@ -26,6 +26,7 @@ dependencies:
   image_cropper:
   firebase_core: "^0.2.4"
   firebase_database : "^1.0.1"
+  firebase_storage : "^1.0.0"
   
 
   # The following adds the Cupertino Icons font to your application.

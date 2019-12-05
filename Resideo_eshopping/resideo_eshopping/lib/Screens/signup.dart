@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:io';
 import 'package:resideo_eshopping/controller/image_picker_handler.dart';
+import 'package:resideo_eshopping/model/user.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class SignUp extends StatefulWidget{
   _SignUpState obj;
@@ -17,8 +20,11 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin,ImagePick
   static GlobalKey<FormState> _formKeyValue = new GlobalKey<FormState>();
   
   File _image;
+  String _uploadFileUrl;
   AnimationController _controler;
   ImagePickerHandler imagePicker;
+  User user;
+  final DatabaseReference database=FirebaseDatabase.instance.reference().child("Customer");
 
   final _nameController =TextEditingController();
   final _emailController =TextEditingController();
@@ -26,6 +32,32 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin,ImagePick
   final _addressController =TextEditingController();
   final _zipcodeController =TextEditingController();
   final _passwordController =TextEditingController();
+
+  _sendData()
+  {
+    database.push().set({
+      'name' : user.name,
+      'email' : user.email,
+      'phone' : user.phone,
+      'password' : user.password,
+      'address' : user.address,
+      'Zipcode' : user.zipcode,
+      'imageUrl' : _uploadFileUrl
+    });
+  }
+
+   Future uploadFile() async {    
+   StorageReference storageReference = FirebaseStorage.instance.ref().child("profile pic");
+   StorageUploadTask uploadTask = storageReference.putFile(_image);   
+   await uploadTask.onComplete;  
+   print('File Uploaded');    
+   storageReference.getDownloadURL().then((fileURL) {    
+     setState(() {    
+       _uploadFileUrl = fileURL;    
+       _sendData();
+     });    
+   });    
+ } 
   
   showAlertDialog(BuildContext context) {
     // set up the buttons
@@ -236,6 +268,7 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin,ImagePick
                     ),
                     TextFormField(
                       controller: _passwordController,
+                      obscureText: true,
                       decoration: const InputDecoration(
                         icon: const Icon(
                           FontAwesomeIcons.key,
@@ -255,6 +288,7 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin,ImagePick
                       },
                     ),
                     TextFormField(
+                      obscureText: true,
                       decoration: const InputDecoration(
                         icon: const Icon(
                           FontAwesomeIcons.check,
@@ -273,15 +307,8 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin,ImagePick
                           return null;
                       },
                     ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton(
+                    SizedBox(height: 20,),
+                     RaisedButton(
                         color: Colors.blue,
                         textColor: Colors.white,
                         child: Padding(
@@ -293,21 +320,40 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin,ImagePick
                                     style: TextStyle(fontSize: 24.0)),
                               ],
                             )),
+                        // onPressed: (){
+                        //   user=User(_nameController.text,_emailController.text,_phoneController.text,_addressController.text,_zipcodeController.text,_passwordController.text);
+                        //   _sendData();
+                        //    uploadFile();
+                        // },
                         onPressed: () {
                           if (_formKeyValue.currentState.validate()) {
-                           
-                            showAlertDialog(context);                            
+                                user=User(_nameController.text,_emailController.text,_phoneController.text,_addressController.text,_zipcodeController.text,_passwordController.text);
+                  
+                           uploadFile();
+                         //  _sendData();
+                           // showAlertDialog(context);                            
                           }
                         },
                         shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0))),
-                  ),
-                ],
+                            borderRadius: new BorderRadius.circular(30.0))
+                        ),
+                  ],
+                ),
               ),
+              // Column(
+              //   crossAxisAlignment: CrossAxisAlignment.stretch,
+              //   children: <Widget>[
+              //     Padding(
+              //       padding: const EdgeInsets.all(8.0),
+              //       child:
+              //     ),
+              //   ],
+              // ),
             ]
         ),
         ),
       ),
     );
+   
   }
 }
