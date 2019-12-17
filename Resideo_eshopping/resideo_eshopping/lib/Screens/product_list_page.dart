@@ -13,6 +13,9 @@ import 'package:resideo_eshopping/util/crud_operations.dart';
 import 'package:resideo_eshopping/widgets/products_tile.dart';
 import 'package:resideo_eshopping/services/authentication.dart';
 import 'package:resideo_eshopping/model/User.dart';
+import 'package:after_layout/after_layout.dart';
+import 'package:resideo_eshopping/util/logger.dart' as logger;
+
 
 class ProductsListPage extends StatefulWidget {
  ProductsListPage(this.user,this.online,this.offline,this.auth);
@@ -20,12 +23,13 @@ class ProductsListPage extends StatefulWidget {
  final VoidCallback online;
  final VoidCallback offline;
  final BaseAuth auth;
+ static const String TAG ="PoductsListPage";
   @override
   _ProductsListPageState createState() => _ProductsListPageState();
 }
 
 class _ProductsListPageState extends State<ProductsListPage> 
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin ,AfterLayoutMixin<ProductsListPage> {
   ProductController productController=ProductController();
   FirebaseDatabaseUtil firebaseDatabaseUtil;
   String dropdownValue = 'Categories';
@@ -60,6 +64,7 @@ class _ProductsListPageState extends State<ProductsListPage>
 
   _getUserDetail(){
     if(widget.user != null){
+      logger.info(ProductsListPage.TAG, " Getting the User details from API  :" );
      firebaseDatabaseUtil.getUserData(widget.user).then((result){
             userInfo=result;
             if(userInfo != null)
@@ -77,6 +82,7 @@ class _ProductsListPageState extends State<ProductsListPage>
 
   _getProduct(String value){
   productController.getProductList(value).then((result){setState((){currentList=result;
+  logger.info(ProductsListPage.TAG, " Getting the Products details from API  :" + value);
   _isProgressBarShown = false;
   });});
   }
@@ -220,10 +226,10 @@ class _ProductsListPageState extends State<ProductsListPage>
 
     );
   }
-
   @override
-  void initState() {
-    super.initState();
+  void afterFirstLayout(BuildContext context) {
+    // Calling the same function "after layout" to resolve the issue.
+    
     firebaseDatabaseUtil=FirebaseDatabaseUtil();
     firebaseDatabaseUtil.initState();
     _getUserDetail();
@@ -246,6 +252,32 @@ class _ProductsListPageState extends State<ProductsListPage>
 
     _getProduct("All");
   }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   firebaseDatabaseUtil=FirebaseDatabaseUtil();
+  //   firebaseDatabaseUtil.initState();
+  //   _getUserDetail();
+  //   Timer.run(() {
+  //     try {
+  //       InternetAddress.lookup('google.com').then((result) {
+  //         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+  //           print('connected');
+  //         } else {
+  //           _showDialog(); // show dialog
+  //         }
+  //       }).catchError((error) {
+  //         _showDialog(); // show dialog
+  //       });
+  //     } on SocketException catch (_) {
+  //       _showDialog();
+  //       print('not connected'); // show dialog
+  //     }
+  //   });
+
+  //   _getProduct("All");
+  // }
 
  
   void _showDialog() {

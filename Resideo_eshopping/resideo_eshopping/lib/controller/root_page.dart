@@ -6,7 +6,8 @@ import 'package:resideo_eshopping/Screens/login_signup_page.dart';
 import 'package:resideo_eshopping/Screens/product_list_page.dart';
 import 'package:resideo_eshopping/services/authentication.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:after_layout/after_layout.dart';
+import 'package:resideo_eshopping/util/logger.dart' as logger;
 class RootPage extends StatefulWidget {
   RootPage({this.auth});
   final BaseAuth auth;
@@ -20,15 +21,15 @@ enum AuthStatus {
   LOGGED_IN,
 }
 
-class _RootPageState extends State<RootPage> {
+class _RootPageState extends State<RootPage> with AfterLayoutMixin<RootPage>{
   AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
   String _userId = "";
   bool _logInButtonPress=false;
   FirebaseUser _user;
-
+  
   @override
-  void initState()  {
-    super.initState();
+  void afterFirstLayout(BuildContext context) {
+    // Calling the same function "after layout" to resolve the issue.
     widget.auth.getCurrentUser().then((user) {
       setState(() {
         if (user != null) {
@@ -40,6 +41,20 @@ class _RootPageState extends State<RootPage> {
       });
     });
   }
+  // @override
+  // void initState()  {
+  //   super.initState();
+  //   widget.auth.getCurrentUser().then((user) {
+  //     setState(() {
+  //       if (user != null) {
+  //         _user=user;
+  //         _userId = user?.uid;
+  //       }
+  //       authStatus =
+  //           user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
+  //     });
+  //   });
+  // }
   
   void _onlogInButtonPress(){
     setState(() {

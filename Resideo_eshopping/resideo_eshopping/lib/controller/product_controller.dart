@@ -2,6 +2,7 @@ import 'package:resideo_eshopping/model/product.dart';
 import 'package:resideo_eshopping/util/dbhelper.dart';
 import 'package:resideo_eshopping/repository/products_repository.dart';
 import 'package:resideo_eshopping/util/crud_operations.dart';
+import 'package:resideo_eshopping/util/logger.dart' as logger;
 
 class ProductController {
   static List<Product> products = <Product>[];
@@ -10,6 +11,7 @@ class ProductController {
   FirebaseDatabaseUtil help = new FirebaseDatabaseUtil();
 
   Future<List<Product>> getProductList(String value) async {
+
     if (products.length == 0) {
       List<Product> productlist = List<Product>();
 

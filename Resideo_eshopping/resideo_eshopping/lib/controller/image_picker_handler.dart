@@ -4,21 +4,24 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:async';
 import 'package:resideo_eshopping/controller/image_picker_dialog.dart';
+import 'package:resideo_eshopping/util/logger.dart' as logger;
 
 class ImagePickerHandler{
-
+  static const String TAG ="ImagePickerHandler";
   AnimationController _controler;
   ImagePickerListener _listener;
   ImagePickerDialog imagePicker;
   ImagePickerHandler(this._listener,this._controler);
   
    openCamera() async {
+    logger.info(TAG, "Opening the Camera for the update details. ") ;
     imagePicker.dismissDialog();
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
     cropImage(image);
   }
 
   openGallery() async {
+    logger.info(TAG, "Opening the Gallery for the update details. ") ;
     imagePicker.dismissDialog();
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
     cropImage(image);
@@ -30,6 +33,7 @@ class ImagePickerHandler{
   }
 
    Future cropImage(File image) async {
+     logger.info(TAG, "Opening the camera for the update details. ") ;
     File croppedFile = await ImageCropper.cropImage(
       sourcePath: image.path,
       aspectRatioPresets: [

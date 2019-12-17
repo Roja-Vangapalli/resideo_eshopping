@@ -15,6 +15,12 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:resideo_eshopping/model/User.dart';
+import 'package:logging/logging.dart';
+import 'package:resideo_eshopping/util/logger.dart' as logger;
+import 'package:after_layout/after_layout.dart';
+
+
+
 
 class StarDisplay extends StatefulWidget {
   final int value;
@@ -42,7 +48,7 @@ class _StarDisplayState extends State<StarDisplay> {
 
 class ProductDetail extends StatefulWidget
 {
- 
+  static const String TAG ="ProductDetail";
   final Product pd;
   final FirebaseUser user;
   final VoidCallback online;
@@ -54,7 +60,7 @@ class ProductDetail extends StatefulWidget
   _ProductDetailState createState() => _ProductDetailState();
 }
 
-class _ProductDetailState extends State<ProductDetail> {
+class _ProductDetailState extends State<ProductDetail> with AfterLayoutMixin<ProductDetail>{
   Product product;
   String urlPDFPath ;
   bool buttonDisabled=false;
@@ -68,6 +74,7 @@ class _ProductDetailState extends State<ProductDetail> {
   Future<void> _initializeVideoPlayerFuture;
 
   getUserDetail(){
+    logger.info(ProductDetail.TAG, "Getting User Details from Firebase "  );
     if(widget.user != null){
      firebaseDatabaseUtil.getUserData(widget.user).then((result){
             userInfo=result;
@@ -75,12 +82,13 @@ class _ProductDetailState extends State<ProductDetail> {
     }
   }
   @override
-  void initState() {
+  void afterFirstLayout(BuildContext context) {
+    // Calling the same function "after layout" to resolve the issue.
     _videoPlayerController = VideoPlayerController.network(widget.pd.pVideo);
     _initializeVideoPlayerFuture = _videoPlayerController.initialize();
     _videoPlayerController.setLooping(true);
     _videoPlayerController.setVolume(1.0);
-    super.initState();
+//    super.initState();
     firebaseDatabaseUtil=FirebaseDatabaseUtil();
     firebaseDatabaseUtil.initState();
     getUserDetail();
@@ -90,8 +98,26 @@ class _ProductDetailState extends State<ProductDetail> {
         print(urlPDFPath);
       });
     });
+
   }
+//  void initState() {
+//    _videoPlayerController = VideoPlayerController.network(widget.pd.pVideo);
+//    _initializeVideoPlayerFuture = _videoPlayerController.initialize();
+//    _videoPlayerController.setLooping(true);
+//    _videoPlayerController.setVolume(1.0);
+//    super.initState();
+//    firebaseDatabaseUtil=FirebaseDatabaseUtil();
+//    firebaseDatabaseUtil.initState();
+//    getUserDetail();
+//    getFileFromUrl(widget.pd.faq).then((f) {
+//      setState(() {
+//        urlPDFPath = f.path;
+//        print(urlPDFPath);
+//      });
+//    });
+//  }
   Future<File> getFileFromUrl(String url) async {
+    logger.info(ProductDetail.TAG, "Getting PDF File from the Url: " + url);
     try {
       var data = await http.get(url);
       var bytes = data.bodyBytes;
@@ -101,7 +127,8 @@ class _ProductDetailState extends State<ProductDetail> {
       File urlFile = await file.writeAsBytes(bytes);
       return urlFile;
     } catch (e) {
-      throw Exception("Error opening url file");
+      logger.error(ProductDetail.TAG, "Error while getting the Pdf from URL :" + url);
+       Exception("Error opening url file");
     }
   }
 
@@ -224,6 +251,7 @@ class _ProductDetailState extends State<ProductDetail> {
                       // width: double.infinity,
                       child: Text("FAQ"),
                       onPressed: () {
+                        logger.error(ProductDetail.TAG, "Error while getting the Pdf from URL :" );
                         if (urlPDFPath != null) {
                           Navigator.push(
                               context,

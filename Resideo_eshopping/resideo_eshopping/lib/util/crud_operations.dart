@@ -6,8 +6,11 @@ import 'package:resideo_eshopping/model/User.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:resideo_eshopping/model/User.dart';
+import 'package:after_layout/after_layout.dart';
+import 'package:resideo_eshopping/util/logger.dart' as logger;
 
 class FirebaseDatabaseUtil {
+  static const String TAG ="FirebaseDatabaseUtil";
   DatabaseReference _productDBRef;
   DatabaseReference _userDBRef;
 
@@ -29,7 +32,8 @@ class FirebaseDatabaseUtil {
     _productDBRef = database.reference().child("Products");
     _userDBRef = database.reference().child("Users");
     database.reference().child("Products").once().then((DataSnapshot snapshot) {
-      print('Connected to second database and read ${snapshot.value}');
+      logger.info(FirebaseDatabaseUtil.TAG, " Connected to second database and read " +snapshot.value );
+//      print('Connected to second database and read ${snapshot.value}');
     });
     database.setPersistenceEnabled(true);
     database.setPersistenceCacheSizeBytes(10000000);
@@ -45,7 +49,8 @@ class FirebaseDatabaseUtil {
 
   void deleteProduct(Product product) async {
     await _productDBRef.child(product.id.toString()).remove().then((_) {
-      print('Transaction  committed.');
+      logger.info(FirebaseDatabaseUtil.TAG, " Deleting the Product details in the Firbase " );
+
     });
   }
 
@@ -54,7 +59,8 @@ class FirebaseDatabaseUtil {
     await _productDBRef.child((x - 1).toString()).update({
       "Inventory": product.quantity,
     }).then((_) {
-      print('Transaction  committed.');
+      logger.info(FirebaseDatabaseUtil.TAG, " Updating the inventory in the Firbase " );
+
     });
   }
 
@@ -67,9 +73,11 @@ class FirebaseDatabaseUtil {
       'zipcode' : userInfo.zipcode,
       'imageUrl' : _uploadFileUrl
     }).then((result){
-      print("profile updated");
+//      print("profile updated");
+      logger.info(FirebaseDatabaseUtil.TAG, " Profile data send successfully to the Firebase " );
     }).catchError((onError){
-      print(onError);
+      logger.error(FirebaseDatabaseUtil.TAG, " Error in sending the Data to  the Firbase " +onError);
+//      print(onError);
     });
   }
 
@@ -83,9 +91,11 @@ class FirebaseDatabaseUtil {
         'zipcode': userInfo.zipcode,
         'imageUrl': _uploadFileUrl
       }).then((result) {
-        print("profile updated");
+        logger.info(FirebaseDatabaseUtil.TAG, " Profile Updated successfully in updateData " );
+//        print("profile updated");
       }).catchError((onError) {
-        print(onError);
+        logger.error(FirebaseDatabaseUtil.TAG, " Error in sending the data to the Firbase while updateData  " +onError);
+//        print(onError);
       });
     }else
       {
@@ -95,9 +105,10 @@ class FirebaseDatabaseUtil {
           'address': userInfo.address,
           'zipcode': userInfo.zipcode,
         }).then((result) {
-          print("profile updated");
+//          print("profile updated");
+          logger.info(FirebaseDatabaseUtil.TAG, " Profile Updated successfully  " );
         }).catchError((onError) {
-          print(onError);
+          logger.error(FirebaseDatabaseUtil.TAG, " Error in sending the Data to the Firbase  " +onError);
         });
       }
   }
@@ -107,9 +118,10 @@ class FirebaseDatabaseUtil {
     try{
     await _userDBRef.child(_user.uid.toString()).once().then((DataSnapshot snapshot){
       user=User.fromSnapshot(snapshot);
+      logger.info(FirebaseDatabaseUtil.TAG, " Getting User data from the Firebase  " +_user.toString());
     });
-    }catch(e){
-     print(e);
+    }catch(e){logger.error(FirebaseDatabaseUtil.TAG, " Error in getting the data to the Firbase  " +e);
+//     print(e);
     }
     return user;
   }
@@ -118,7 +130,8 @@ class FirebaseDatabaseUtil {
    StorageReference storageReference = FirebaseStorage.instance.ref().child("profile pic"+user.uid.toString());
    StorageUploadTask uploadTask = storageReference.putFile(image);   
    await uploadTask.onComplete;  
-   print('File Uploaded');    
+//   print('File Uploaded');
+   logger.info(FirebaseDatabaseUtil.TAG, " File Uploaded Succesfully to Firebase Storage  " );
    storageReference.getDownloadURL().then((fileURL) {
      if(isEdit)
        updateData(user, userInfo, fileURL);

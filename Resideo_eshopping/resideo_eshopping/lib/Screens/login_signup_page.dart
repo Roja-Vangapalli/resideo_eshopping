@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:resideo_eshopping/Screens/product_list_page.dart';
-import 'package:resideo_eshopping/Screens/signup.dart';
 import 'package:resideo_eshopping/services/authentication.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:after_layout/after_layout.dart';
+import 'package:resideo_eshopping/util/logger.dart' as logger;
 
 class LoginSignUpPage extends StatefulWidget {
   LoginSignUpPage({this.auth, this.onSignedIn});
@@ -16,17 +16,13 @@ class LoginSignUpPage extends StatefulWidget {
 
 enum FormMode { LOGIN, SIGNUP }
 
-class _LoginSignUpPageState extends State<LoginSignUpPage> {
+class _LoginSignUpPageState extends State<LoginSignUpPage> with AfterLayoutMixin<LoginSignUpPage> {
   final _formKey = new GlobalKey<FormState>();
-
   String _email;
   String _password;
   String _errorMessage;
-
   // Initial form is login form
   FormMode _formMode = FormMode.LOGIN;
-  bool _isIos;
-  bool _isLoading;
 
   // Check if form is valid before perform login or signup
   bool _validateAndSave() {
@@ -38,57 +34,54 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     return false;
   }
 
-  // Perform login or signup
+  //Perform login or signup
   void _validateAndSubmit() async {
     setState(() {
       _errorMessage = "";
-      _isLoading = true;
     });
     if (_validateAndSave()) {
       String userId = "";
       try {
+        SharedPreferences prefs;
+        prefs = await SharedPreferences.getInstance();
+
         if (_formMode == FormMode.LOGIN) {
           userId = await widget.auth.signIn(_email, _password);
-          //SharedPreferences prefs = await SharedPreferences.getInstance();
-          //prefs.setString('email', _email);
-          //prefs.setBool(true);
-          //Navigator.pushReplacement(context,
-               //MaterialPageRoute(builder: (BuildContext ctx) => Blankpage()));
           print('Signed in: $userId');
+          prefs.setString('uid', userId);
         } else {
           userId = await widget.auth.signUp(_email, _password);
-          widget.auth.sendEmailVerification();
-          _showVerifyEmailSentDialog();
           print('Signed up user: $userId');
         }
         setState(() {
-          _isLoading = false;
+          //_isLoading = false;
         });
-
-        if ( userId != null && userId.length > 0 && _formMode == FormMode.LOGIN) {
-          widget.onSignedIn();
-        }
+        widget.onSignedIn();
 
       } catch (e) {
-        print('Error: $e');
         setState(() {
-          _isLoading = false;
-          if (_isIos) {
-            _errorMessage = e.details;
-          } else
             _errorMessage = e.message;
         });
+        print(_errorMessage);
       }
     }
+    else {
+      setState(() {
+      });
+    }
   }
-
-
+  
   @override
-  void initState() {
+  void afterFirstLayout(BuildContext context) {
+    // Calling the same function "after layout" to resolve the issue.
     _errorMessage = "";
-    _isLoading = false;
-    super.initState();
   }
+
+  // @override
+  // void initState() {
+  //   _errorMessage = "";
+  //   super.initState();
+  // }
 
   void _changeFormToSignUp() {
     _formKey.currentState.reset();
@@ -108,7 +101,6 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    _isIos = Theme.of(context).platform == TargetPlatform.iOS;
     return new Scaffold(
         appBar: new AppBar(
           title: new Text('Resideo e-Shopping'),
@@ -116,38 +108,8 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
         body: Stack(
           children: <Widget>[
             _showBody(),
-            _showCircularProgress(),
           ],
         ));
-  }
-
-  Widget _showCircularProgress(){
-    if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
-    } return Container(height: 0.0, width: 0.0,);
-
-  }
-
-  void _showVerifyEmailSentDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Verify your account"),
-          content: new Text("Link to verify account has been sent to your email"),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text("Dismiss"),
-              onPressed: () {
-                _changeFormToLogin();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Widget _showBody(){
@@ -170,7 +132,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   }
 
   Widget _showErrorMessage() {
-    if (_errorMessage.length > 0 && _errorMessage != null) {
+    if (_errorMessage != null && _errorMessage.length>0) {
       return new Text(
         _errorMessage,
         style: TextStyle(
@@ -216,6 +178,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
             )),
             onSaved: (value) => _email = value.trim(),
             validator: FieldValidator.validateEmail,
+            // onSaved: (value) => _email = value.trim(),
       ),
     );
   }
@@ -224,6 +187,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
       child: new TextFormField(
+        //autovalidate: true,
         maxLines: 1,
         obscureText: true,
         autofocus: false,
@@ -233,13 +197,11 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
               Icons.lock,
               color: Colors.grey,
             )),
-        validator: (value) => value.isEmpty ? 'Password can\'t be empty' : null,
-        onSaved: (value) => _password = value.trim(),
+            onSaved: (value) => _password = value.trim(),
+        validator: FieldValidator.validatePassword,
       ),
     );
   }
-
- 
 
   Widget _showSecondaryButton() {
     return new FlatButton(
@@ -268,9 +230,9 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                 ? new Text('Login',
                     style: new TextStyle(fontSize: 20.0, color: Colors.white))
                 : new Text('Create account',
-                    style: new TextStyle(fontSize: 20.0, color: Colors.white)),
+                    style: new TextStyle(fontSize: 20.0, color: Colors.white)),             
             onPressed: _validateAndSubmit,
-          ),
+            ),
         ));
   }
   
@@ -279,7 +241,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
 class FieldValidator{
   static String validateEmail(String value)
   {
-    if(value.isEmpty) return 'Enter Email';
+    if(value.isEmpty) {return 'Enter Email';}
     Pattern pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regex = new RegExp(pattern);
     if(!regex.hasMatch(value)){
@@ -290,7 +252,8 @@ class FieldValidator{
 
   static String validatePassword(String value)
   {
-    if(value.isEmpty) return 'Enter Password';
+    if(value.isEmpty) {return 'Enter Password';}
     return null;
   }
+
 }

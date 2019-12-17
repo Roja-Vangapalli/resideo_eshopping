@@ -7,7 +7,8 @@ import 'package:giffy_dialog/giffy_dialog.dart';
 import 'package:resideo_eshopping/model/User.dart';
 import 'package:resideo_eshopping/services/authentication.dart';
 import 'package:resideo_eshopping/controller/root_page.dart';
-
+import 'package:after_layout/after_layout.dart';
+import 'package:resideo_eshopping/util/logger.dart' as logger;
 
 
 class AddUserDetails extends StatefulWidget {
@@ -24,7 +25,7 @@ class AddUserDetails extends StatefulWidget {
   _AddUserDetailsState createState() => _AddUserDetailsState();
 }
 
-class _AddUserDetailsState extends State<AddUserDetails> {
+class _AddUserDetailsState extends State<AddUserDetails>  with AfterLayoutMixin<AddUserDetails>{
   final ProductController productController=ProductController();
   
 void navigateToHomePage(BuildContext context) async{
@@ -89,10 +90,16 @@ void navigateToHomePage(BuildContext context) async{
     );
   }
   @override
-  void initState(){
-    super.initState();
+  void afterFirstLayout(BuildContext context) {
+    // Calling the same function "after layout" to resolve the issue.
     productController.init();
+    
   }
+  // @override
+  // void initState(){
+  //   super.initState();
+  //   productController.init();
+  // }
   
 
   @override

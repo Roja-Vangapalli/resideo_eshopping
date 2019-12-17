@@ -1,10 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:resideo_eshopping/util/logger.dart' as logger;import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:io';
 import 'package:resideo_eshopping/controller/image_picker_handler.dart';
 import 'package:resideo_eshopping/model/User.dart';
 import 'package:resideo_eshopping/util/crud_operations.dart';
+import 'package:after_layout/after_layout.dart';
+import 'package:resideo_eshopping/util/logger.dart' as logger;
+
 
 class SignUp extends StatefulWidget{
   SignUp(this.user,this.profile,this.userInfo);
@@ -16,7 +19,7 @@ class SignUp extends StatefulWidget{
 
 }
 
-class _SignUpState extends State<SignUp> with TickerProviderStateMixin,ImagePickerListener{
+class _SignUpState extends State<SignUp> with TickerProviderStateMixin,ImagePickerListener,AfterLayoutMixin<SignUp>{
   final _formKeyValue = new GlobalKey<FormState>();
   
   File _image;
@@ -81,11 +84,9 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin,ImagePick
       },
     );
   }
-
   @override
-  void initState()
-  {
-    super.initState();
+  void afterFirstLayout(BuildContext context) {
+    // Calling the same function "after layout" to resolve the issue.
     _controler=AnimationController(vsync: this,
     duration: const Duration(microseconds: 500));
     imagePicker=ImagePickerHandler(this,this._controler);
@@ -93,7 +94,21 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin,ImagePick
     firebaseDatabaseUtil = FirebaseDatabaseUtil();
     firebaseDatabaseUtil.initState();
     _fillUserDetail();
+    
   }
+
+  // @override
+  // void initState()
+  // {
+  //   super.initState();
+  //   _controler=AnimationController(vsync: this,
+  //   duration: const Duration(microseconds: 500));
+  //   imagePicker=ImagePickerHandler(this,this._controler);
+  //   imagePicker.init();
+  //   firebaseDatabaseUtil = FirebaseDatabaseUtil();
+  //   firebaseDatabaseUtil.initState();
+  //   _fillUserDetail();
+  // }
 
   @override
   void dispose(){

@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:resideo_eshopping/controller/image_picker_handler.dart';
+import 'package:after_layout/after_layout.dart';
 
 class ImagePickerDialog extends StatelessWidget {
   final ImagePickerHandler _listener;
