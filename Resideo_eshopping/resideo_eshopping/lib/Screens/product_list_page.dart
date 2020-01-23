@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,16 +15,13 @@ import 'package:resideo_eshopping/model/user_repository.dart';
 import 'package:resideo_eshopping/stores/home_page_store.dart';
 import 'package:resideo_eshopping/util/firebase_database_helper.dart';
 import 'package:resideo_eshopping/Screens/products_tile.dart';
-import 'package:resideo_eshopping/model/User.dart';
 import 'package:resideo_eshopping/util/logger.dart' as logger;
 import 'package:resideo_eshopping/widgets/progress_indicator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductsListPage extends StatefulWidget {
-  ProductsListPage({this.user});
-  final FirebaseUser user;
-
-  static const String TAG = "PoductsListPage";
+ static const String TAG ="PoductsListPage";
+  ProductsListPage();
   @override
   _ProductsListPageState createState() => _ProductsListPageState();
 }
@@ -33,57 +29,26 @@ class ProductsListPage extends StatefulWidget {
 class _ProductsListPageState extends State<ProductsListPage>
     with SingleTickerProviderStateMixin {
   ProductController productController = ProductController();
-
   final _homeStore = HomePageStore();
   final key = GlobalKey<ScaffoldState>();
-
   FirebaseDatabaseUtil firebaseDatabaseUtil;
-
   String dropdownValue = 'Categories';
   List<Product> currentList = <Product>[];
   bool _isProgressBarShown = true;
-
-  User userInfo;
-
   String _name = "";
   String _email = "";
   String _imageUrl;
 
-  void _setProfile() {
-    if (widget.user == null) {
+  void _setProfile(user) {
+    if (user == null) {
       _name = "";
       _email = "";
       _imageUrl = null;
     } else {
-      _email = widget.user.email.toString();
+      _email = user.email.toString();
     }
   }
 
-  _getUserDetail() {
-    if (widget.user != null) {
-      logger.info(
-          ProductsListPage.TAG, " Getting the User details from API  :");
-      firebaseDatabaseUtil.getUserData(widget.user).then((result) {
-        userInfo = result;
-        if (userInfo != null) {
-          logger.info(ProductsListPage.TAG,
-              " Getting the User INFO details from API  are not null :");
-          setState(() {
-            _name = userInfo.name;
-            _imageUrl = userInfo.imageUrl;
-          });
-        } else {
-          logger.info(ProductsListPage.TAG,
-              " Getting the User INFO details from API  are null :");
-        }
-      }).catchError((error) {
-        logger.error(ProductsListPage.TAG,
-            " Error in the getting user details from API  :" + error);
-      });
-    } else {
-      logger.info(ProductsListPage.TAG, " widget user are null :");
-    }
-  }
 
   _getProduct(String value) {
     logger.info(
@@ -91,12 +56,14 @@ class _ProductsListPageState extends State<ProductsListPage>
 
     productController.getProductList(value).then((result) {
       if (result != null) {
-        setState(() {
-          currentList = result;
-          logger.info(ProductsListPage.TAG,
-              " Getting the Products details from API  :" + value);
-          _isProgressBarShown = false;
-        });
+        if (mounted) {
+          setState(() {
+            currentList = result;
+            logger.info(ProductsListPage.TAG,
+                " Getting the Products details from API  :" + value);
+            _isProgressBarShown = false;
+          });
+        }
       } else {
         logger.info(ProductsListPage.TAG, " product list is empty  :");
       }
@@ -108,8 +75,8 @@ class _ProductsListPageState extends State<ProductsListPage>
   @override
   Widget build(BuildContext context) {
     Widget widget1;
-
-    _setProfile();
+    UserRepository userRepository = Provider.of<UserRepository>(context);
+    _setProfile(userRepository.user);
 
     if (_isProgressBarShown) {
       widget1 = Center(
@@ -118,22 +85,13 @@ class _ProductsListPageState extends State<ProductsListPage>
         child: ProgressIndicatorWidget(),
       ));
     } else {
-      if (currentList.length <= 0) {
-        widget1 = Center(
-          child: Text(
-            "Unable to load the products\n Please try after some time",
-            textAlign: TextAlign.center,
-          ),
-        );
-      } else {
-        widget1 = ListView.builder(
-          shrinkWrap: true,
-          padding: const EdgeInsets.all(0.0),
-          itemCount: currentList.length,
-          itemBuilder: (context, index) =>
-              ProductsTile(currentList[index], widget.user, userInfo),
-        );
-      }
+      widget1 = ListView.builder(
+        shrinkWrap: true,
+        padding: const EdgeInsets.all(0.0),
+        itemCount: currentList.length,
+        itemBuilder: (context, index) =>
+            ProductsTile(currentList[index]),
+      );
     }
 
     return Scaffold(
@@ -143,28 +101,20 @@ class _ProductsListPageState extends State<ProductsListPage>
           padding: EdgeInsets.zero,
           children: <Widget>[
             Container(
-                child: (_imageUrl != null)
+                child: (userRepository.imageUrl!= "" && userRepository.imageUrl != null)
                     ? UserAccountsDrawerHeader(
-                        accountName: Text(_name),
+                        accountName: Text(userRepository.name),
                         accountEmail: Text(_email),
-                        currentAccountPicture: CachedNetworkImage(
-                          imageUrl: _imageUrl,
-                          imageBuilder: (context, imageProvider) =>
-                              CircleAvatar(
-                            backgroundImage: imageProvider,
-                            backgroundColor:
-                                Theme.of(context).platform == TargetPlatform.iOS
-                                    ? Colors.blue
-                                    : Colors.white,
-                          ),
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(),
-                          errorWidget: (context, url, error) => Image.asset(
-                              "assets/images/no_image_available.png"),
+                        currentAccountPicture: CircleAvatar(
+                          backgroundImage: NetworkImage(userRepository.imageUrl),
+                          backgroundColor:
+                              Theme.of(context).platform == TargetPlatform.iOS
+                                  ? Colors.blue
+                                  : Colors.white,
                         ),
                       )
                     : UserAccountsDrawerHeader(
-                        accountName: Text(_name),
+                        accountName: Text(userRepository.name),
                         accountEmail: Text(_email),
                         currentAccountPicture: CircleAvatar(
                           //backgroundImage: NetworkImage(_imageUrl),
@@ -204,12 +154,10 @@ class _ProductsListPageState extends State<ProductsListPage>
                 icon: FontAwesomeIcons.user,
                 text: 'My Account',
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => SignUp(widget.user, userInfo)));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => SignUp()));
                 }),
-            _loginSignupButton(),
+            _loginSignupButton(userRepository.user),
           ],
         ),
       ),
@@ -220,12 +168,14 @@ class _ProductsListPageState extends State<ProductsListPage>
     );
   }
 
-  Widget _loginSignupButton() {
-    if (widget.user != null) {
+  Widget _loginSignupButton(user) {
+    UserRepository userRepository = Provider.of<UserRepository>(context);
+    if (userRepository.user != null) {
       return PlatformButton(
           onPressed: () async {
-            await Provider.of<UserRepository>(context).signOut();
+            await userRepository.signOut();
             //widget.offline;
+            userRepository.userInfo = null;
             Flushbar(
               message: "You are logged out!",
               duration: Duration(seconds: 3),
@@ -275,7 +225,6 @@ class _ProductsListPageState extends State<ProductsListPage>
             .then((result) {
           if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
             productController.listenforplace();
-            _getUserDetail();
             _getProduct("All");
             logger.info(ProductsListPage.TAG, " Connected :");
           } else {
@@ -302,6 +251,17 @@ class _ProductsListPageState extends State<ProductsListPage>
   @override
   void didUpdateWidget(ProductsListPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _getUserDetail();
+    // user2.getUserdetails();
+    UserRepository user1 = Provider.of<UserRepository>(context);
+    user1.getUserdetails();
+  }
+
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Internet connection is required!"),
+      ),
+    );
   }
 }

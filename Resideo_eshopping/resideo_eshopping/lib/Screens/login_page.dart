@@ -18,7 +18,6 @@ enum FormMode {LOGIN, SIGNUP}
 class LoginPage extends StatefulWidget{
   LoginPage({ this.onSignedIn});
   final VoidCallback onSignedIn;
-
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -33,12 +32,9 @@ class _LoginPageState extends State<LoginPage> with AfterLayoutMixin<LoginPage>{
   static const String TAG ="LoginSignUpPage";
   final _formKey = GlobalKey<FormState>();
   final _key = GlobalKey<ScaffoldState>();
-
   final _store = LoginPageStore();
-
   FormMode _formMode = FormMode.LOGIN;
   String userId = "";
-
   @override
   void afterFirstLayout(BuildContext context){
     _passwordFocusNode = FocusNode();
@@ -116,9 +112,12 @@ class _LoginPageState extends State<LoginPage> with AfterLayoutMixin<LoginPage>{
           radius: 80.0,
           child: GestureDetector(
             onTap:(){
+              if (mounted) {
               setState(() {
               isOpen = !isOpen;
-            });},
+            });
+            }
+            },
 
           child:FlareActor('assets/images/shopping-cart.flr',animation: isOpen ? 'activate' : 'deactivate'),
           
@@ -166,7 +165,7 @@ class _LoginPageState extends State<LoginPage> with AfterLayoutMixin<LoginPage>{
 
 
   Widget _buildSignInButton() {
-    final user = Provider.of<UserRepository>(context);
+    UserRepository user = Provider.of<UserRepository>(context);
         return Padding(
           padding: EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0),
           child: SizedBox(
@@ -188,27 +187,26 @@ class _LoginPageState extends State<LoginPage> with AfterLayoutMixin<LoginPage>{
                       prefs.setString('uid', userId);
 
                       if (!mounted) return;
+                      if(mounted) {
+                        setState(() {
+                          if (userId != null) {
+                            Navigator.of(context).pop();
 
-                      setState(() {
-
-                        if(userId != null){
-                          Navigator.of(context).pop();
-
-                          Flushbar(
-                            message: "You are Signed in!",
-                            duration: Duration(seconds: 3),
-                          )..show(context);
-                        }
-                        else{
-                          Flushbar(
-                            message: "Not signed in! Please enter correct details",
-                            duration: Duration(seconds: 3),
-                          )..show(context);
-                        }
-                      });
-
-
-
+                            Flushbar(
+                              message: "You are Signed in!",
+                              duration: Duration(seconds: 3),
+                            )
+                              ..show(context);
+                          }
+                          else {
+                            Flushbar(
+                              message: "Not signed in! Please enter correct details",
+                              duration: Duration(seconds: 3),
+                            )
+                              ..show(context);
+                          }
+                        });
+                      }
                     }
                     else{
                       userId = await user.signUp(_email.text, _password.text);
@@ -272,20 +270,23 @@ class _LoginPageState extends State<LoginPage> with AfterLayoutMixin<LoginPage>{
   }
 
   void _changeFormToSignUp(){
+    if (mounted) {
     setState(() {
       _email.clear();
       _password.clear();
       _formMode = FormMode.SIGNUP;
     });
-
+    }
   }
 
   void _changeFormToLogin(){
+    if (mounted) {
     setState(() {
       _email.clear();
       _password.clear();
       _formMode = FormMode.LOGIN;
     });
+    }
 
   }
 

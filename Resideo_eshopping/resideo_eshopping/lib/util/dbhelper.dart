@@ -9,7 +9,7 @@ class Dbhelper {
 
   int _dbversion = 1;
   String _dbname = "eshoppingdb.db";
-  String _tblname = 'product';
+  String _tblname = 'Product';
   String _colid = "ProductId";
   String _coltitle = "ProductName";
   String _colsDesc = "ShortDescription";

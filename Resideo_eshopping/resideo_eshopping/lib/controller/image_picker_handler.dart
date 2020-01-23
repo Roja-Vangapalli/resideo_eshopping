@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:io';
-
 import 'package:image_picker/image_picker.dart';
 import 'package:resideo_eshopping/Screens/image_picker_dialog.dart';
 import 'package:resideo_eshopping/util/firebase_database_helper.dart';

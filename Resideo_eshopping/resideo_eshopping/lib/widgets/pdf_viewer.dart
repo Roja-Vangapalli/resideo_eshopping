@@ -35,16 +35,20 @@ class _PdfViewPageState extends State<PdfViewPage> {
             onError: (e) {
             },
             onRender: (_pages) {
-              setState(() {
-                _totalPages = _pages;
-                pdfReady = true;
-              });
+              if(mounted){
+                setState(() {
+                  _totalPages = _pages;
+                  pdfReady = true;
+                });
+              }
             },
             onViewCreated: (PDFViewController vc) {
               _pdfViewController = vc;
             },
             onPageChanged: (int page, int total) {
-              setState(() {});
+              if(mounted){
+                setState(() {});
+              }
             },
             onPageError: (page, e) {},
           ),
