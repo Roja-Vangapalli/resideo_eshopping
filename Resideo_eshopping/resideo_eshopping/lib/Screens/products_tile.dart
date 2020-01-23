@@ -1,27 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:resideo_eshopping/Screens/product_detail.dart';
 import 'package:resideo_eshopping/model/product.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:resideo_eshopping/model/User.dart';
+import 'package:resideo_eshopping/model/user_repository.dart';
 import 'package:resideo_eshopping/util/logger.dart' as logger;
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductsTile extends StatelessWidget {
   Product _products;
-  FirebaseUser user;
-  User userInfo;
-  ProductsTile(this._products,this.user,this.userInfo);
+  ProductsTile(this._products);
   Widget widget;
-
   @override 
   Widget build(BuildContext context) {
-    void navigateToProductdetail(Product pd, FirebaseUser user,
-        User userInfo) async {
-          print(user);
+    UserRepository user1 = Provider.of<UserRepository>(context);
+    void navigateToProductdetail(Product pd, 
+        ) async {
       Navigator.push(context, ScaleRoute(
-          page: ProductDetail(pd, user, userInfo)));
+          page: ProductDetail(pd)));
     }
     if (_products == null)
       logger.info("ProductsTile", "Product object passed in product tile is null");
@@ -51,7 +48,7 @@ class ProductsTile extends StatelessWidget {
                 ),
                 onTap: () {
                   navigateToProductdetail(
-                      _products, user, userInfo);
+                      _products);
                 },
 
                 leading:
@@ -78,6 +75,7 @@ class ProductsTile extends StatelessWidget {
       );
     }
   }
+  
 }
 
 class ScaleRoute extends PageRouteBuilder {

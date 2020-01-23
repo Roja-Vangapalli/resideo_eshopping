@@ -5,7 +5,6 @@ import 'package:resideo_eshopping/controller/image_picker_handler.dart';
 class ImagePickerDialog extends StatelessWidget {
   final ImagePickerHandler _listener;
   final AnimationController _controller;
-
   BuildContext context;
   final bool _deletePhotoButtonEnable;
   ImagePickerDialog(

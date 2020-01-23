@@ -26,6 +26,7 @@ class FirebaseDatabaseUtil  {
     
     database= new FirebaseDatabase();
     _dbRef = database.reference();
+    // database=FirebaseDatabase.instance;
     // database.setPersistenceEnabled(true);
     // int intValue = int.parse('1000');
     // database.setPersistenceCacheSizeBytes(intValue);

@@ -23,7 +23,6 @@ class HomePage extends StatelessWidget{
                   return Observer(
                     builder: (context) {
                       return ProductsListPage(
-                          user: user.user
                           );
                     }
                   );

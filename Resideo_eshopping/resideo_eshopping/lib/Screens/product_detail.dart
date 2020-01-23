@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:carousel_pro/carousel_pro.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -16,7 +15,6 @@ import 'package:resideo_eshopping/model/user_repository.dart';
 import 'package:resideo_eshopping/stores/home_page_store.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
-import 'package:resideo_eshopping/model/User.dart';
 import 'package:resideo_eshopping/widgets/rating_start.dart';
 import 'package:resideo_eshopping/util/logger.dart' as logger;
 import 'package:resideo_eshopping/widgets/pdf_viewer.dart';
@@ -27,11 +25,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductDetail extends StatefulWidget {
   final Product product;
-  final FirebaseUser user ;
-  final User userInfo;
   ProductDetail(
-      this.product, this.user,this.userInfo);
-
+      this.product);
   @override
   _ProductDetailState createState() => _ProductDetailState();
 }
@@ -55,7 +50,8 @@ class _ProductDetailState extends State<ProductDetail> {
   @override
   void initState() {
     super.initState();
-    caldistance(widget.product.latitude, widget.product.longitude);
+     caldistance(widget.product.latitude, widget.product.longitude);
+
     _videoPlayerController =
         VideoPlayerController.network(widget.product.pVideoUrl);
     _initializeVideoPlayerFuture = _videoPlayerController.initialize();
@@ -63,12 +59,13 @@ class _ProductDetailState extends State<ProductDetail> {
     _videoPlayerController.setVolume(1.0);
     _productController = ProductController();
     getFileFromUrl(widget.product.faqUrl).then((f) {
+      if (mounted) {
       setState(() {
         urlPDFPath = f.path;
       });
+      }
     });
   }
-
 
   Future<File> getFileFromUrl(String url) async {
     logger.info(TAG, "Getting PDF File from the Url: " + url);
@@ -83,25 +80,25 @@ class _ProductDetailState extends State<ProductDetail> {
   }
 
 
-  void caldistance(String lat, String long) async {
-    double slat = double.parse(lat);
-    double slong = double.parse(long);
-    int len = ProductController.placelist.length;
-    for (int i = 0; i < len; i++)  {
-      double elat = double.parse(ProductController.placelist[i].latitude);
-      double elong = double.parse(ProductController.placelist[i].longitude);
-      double distanceInM = await Geolocator().distanceBetween(slat, slong, elat, elong);
-      double distanceInKm = distanceInM / 1000;
-      if (distanceInKm < 5) {
-        finallist.add(ProductController.placelist[i]);
-        distance.add(distanceInKm.toInt().floor().toString());
-      }
-    }
-  }
+   void caldistance(String lat, String long) async {
+     double slat = double.parse(lat);
+     double slong = double.parse(long);
+     int len = ProductController.placelist.length;
+     for (int i = 0; i < len; i++)  {
+       double elat = double.parse(ProductController.placelist[i].latitude);
+       double elong = double.parse(ProductController.placelist[i].longitude);
+       double distanceInM = await Geolocator().distanceBetween(slat, slong, elat, elong);
+       double distanceInKm = distanceInM / 1000;
+       if (distanceInKm < 5) {
+         finallist.add(ProductController.placelist[i]);
+         distance.add(distanceInKm.toInt().floor().toString());
+       }
+     }
+   }
 
   @override
   Widget build(BuildContext context) {
-    final user1 = Provider.of<UserRepository>(context);
+    UserRepository user1 = Provider.of<UserRepository>(context);
     buttonDisabled =
         _productController.enableDisableOrderNowButton(widget.product.quantity);
     void navigateToCustomerAddress() async {
@@ -111,8 +108,6 @@ class _ProductDetailState extends State<ProductDetail> {
               builder: (context) =>
                   OrderConfirmationPage(
                     widget.product,
-                    widget.userInfo,
-                    user1.user,
                   )));
     }
 
@@ -202,9 +197,9 @@ class _ProductDetailState extends State<ProductDetail> {
                                 );
                               }));
                           // Navigator.popAndPushNamed(context, 'OrderConfirmationPage');
-                        } else if (widget.userInfo == null ||
-                            widget.userInfo.address == null ||
-                            widget.userInfo.phone == null) {
+                        } else if (user1.userinfo == null ||
+                            user1.userInfo.address == null ||
+                            user1.userInfo.phone == null) {
                           showAlertDialog(context);
                         } else
                           navigateToCustomerAddress();
@@ -331,6 +326,7 @@ class _ProductDetailState extends State<ProductDetail> {
     }
   }
 
+  
   @override
   void dispose() {
     _videoPlayerController.dispose();
@@ -393,6 +389,7 @@ class _ProductDetailState extends State<ProductDetail> {
                 color: Colors.transparent,
                 //textColor: Colors.white,
                 onPressed: () {
+                  if (mounted) { 
                   setState(() {
                     if (_videoPlayerController.value.isPlaying) {
                       _videoPlayerController.pause();
@@ -400,6 +397,7 @@ class _ProductDetailState extends State<ProductDetail> {
                       _videoPlayerController.play();
                     }
                   });
+                  }
                 },
                 child: Icon(
                   _videoPlayerController.value.isPlaying ? Icons.pause : Icons

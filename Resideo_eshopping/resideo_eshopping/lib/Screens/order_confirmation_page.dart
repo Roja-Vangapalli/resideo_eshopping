@@ -1,28 +1,24 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:resideo_eshopping/Screens/home_page.dart';
 import 'package:resideo_eshopping/controller/product_controller.dart';
 import 'package:resideo_eshopping/model/product.dart';
 import 'package:giffy_dialog/giffy_dialog.dart';
-import 'package:resideo_eshopping/model/User.dart';
 import 'package:after_layout/after_layout.dart';
+import 'package:resideo_eshopping/model/user_repository.dart';
 import 'package:resideo_eshopping/util/logger.dart' as logger;
 
 class OrderConfirmationPage extends StatefulWidget {
   final Product product;
-  final User userInfo;
-  final FirebaseUser user;
-
-  OrderConfirmationPage(this.product, this.userInfo, this.user);
-
+  OrderConfirmationPage(this.product,);
   @override
   _OrderConfirmationPageState createState() => _OrderConfirmationPageState();
 }
 
 class _OrderConfirmationPageState extends State<OrderConfirmationPage> with AfterLayoutMixin<OrderConfirmationPage> {
-  ProductController _productController;
+  ProductController _productController ;
   static const String TAG ="OrderConfirmationPage";
 
   void navigateToHomePage(BuildContext context) async => Navigator.of(context).pushAndRemoveUntil(
@@ -121,7 +117,8 @@ void afterFirstLayout(BuildContext context) {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.product != null && widget.userInfo != null) {
+    UserRepository user1 = Provider.of<UserRepository>(context);
+    if (widget.product != null && user1.userInfo != null) {
       return PlatformScaffold(
         appBar: PlatformAppBar(
           title: Container(
@@ -202,7 +199,7 @@ void afterFirstLayout(BuildContext context) {
                       Container(
                           child: Flexible(
                             child: PlatformText(
-                              widget.userInfo.address.toString(),
+                              user1.userInfo.address.toString(),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 5,
                               style: TextStyle(
@@ -228,7 +225,7 @@ void afterFirstLayout(BuildContext context) {
                       Container(
                         margin: const EdgeInsets.all(20.0),
                         child: PlatformText(
-                          widget.userInfo.phone.toString(),
+                          user1.userInfo.phone.toString(),
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 20),
                         ),
