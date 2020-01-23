@@ -12,7 +12,7 @@ import 'package:resideo_eshopping/util/logger.dart' as logger;
 
 class OrderConfirmationPage extends StatefulWidget {
   final Product product;
-  OrderConfirmationPage(this.product,);
+  OrderConfirmationPage(this.product);
   @override
   _OrderConfirmationPageState createState() => _OrderConfirmationPageState();
 }
@@ -117,8 +117,8 @@ void afterFirstLayout(BuildContext context) {
 
   @override
   Widget build(BuildContext context) {
-    UserRepository user1 = Provider.of<UserRepository>(context);
-    if (widget.product != null && user1.userInfo != null) {
+    UserRepository userRepository = Provider.of<UserRepository>(context);
+    if (widget.product != null && userRepository.userInfo != null) {
       return PlatformScaffold(
         appBar: PlatformAppBar(
           title: Container(
@@ -199,7 +199,7 @@ void afterFirstLayout(BuildContext context) {
                       Container(
                           child: Flexible(
                             child: PlatformText(
-                              user1.userInfo.address.toString(),
+                              userRepository.userInfo.address.toString(),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 5,
                               style: TextStyle(
@@ -225,7 +225,7 @@ void afterFirstLayout(BuildContext context) {
                       Container(
                         margin: const EdgeInsets.all(20.0),
                         child: PlatformText(
-                          user1.userInfo.phone.toString(),
+                          userRepository.userInfo.phone.toString(),
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 20),
                         ),

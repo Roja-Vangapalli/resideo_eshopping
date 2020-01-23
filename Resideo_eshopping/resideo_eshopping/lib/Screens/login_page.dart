@@ -1,4 +1,5 @@
 import 'package:after_layout/after_layout.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
@@ -111,16 +112,7 @@ class _LoginPageState extends State<LoginPage> with AfterLayoutMixin<LoginPage>{
           backgroundColor: Colors.transparent,
           radius: 80.0,
           child: GestureDetector(
-            onTap:(){
-              if (mounted) {
-              setState(() {
-              isOpen = !isOpen;
-            });
-            }
-            },
-
-          child:FlareActor('assets/images/shopping-cart.flr',animation: isOpen ? 'activate' : 'deactivate'),
-          
+          child:Image.asset('assets/images/logo.png'),
           ),
           
         ),
@@ -191,11 +183,13 @@ class _LoginPageState extends State<LoginPage> with AfterLayoutMixin<LoginPage>{
                         setState(() {
                           if (userId != null) {
                             Navigator.of(context).pop();
-
+                            UserRepository user1 = Provider.of<UserRepository>(context);
+                           user1.getUserdetails();
                             Flushbar(
                               message: "You are Signed in!",
                               duration: Duration(seconds: 3),
                             )
+                           
                               ..show(context);
                           }
                           else {

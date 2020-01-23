@@ -17,7 +17,6 @@ import 'package:resideo_eshopping/util/firebase_database_helper.dart';
 import 'package:resideo_eshopping/Screens/products_tile.dart';
 import 'package:resideo_eshopping/util/logger.dart' as logger;
 import 'package:resideo_eshopping/widgets/progress_indicator.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductsListPage extends StatefulWidget {
  static const String TAG ="PoductsListPage";
@@ -252,8 +251,8 @@ class _ProductsListPageState extends State<ProductsListPage>
   void didUpdateWidget(ProductsListPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     // user2.getUserdetails();
-    UserRepository user1 = Provider.of<UserRepository>(context);
-    user1.getUserdetails();
+    UserRepository userRepository = Provider.of<UserRepository>(context);
+    userRepository.getUserdetails();
   }
 
   void _showDialog() {

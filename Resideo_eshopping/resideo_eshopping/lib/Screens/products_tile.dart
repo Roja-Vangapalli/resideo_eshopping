@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 import 'package:resideo_eshopping/Screens/product_detail.dart';
 import 'package:resideo_eshopping/model/product.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:resideo_eshopping/model/user_repository.dart';
 import 'package:resideo_eshopping/util/logger.dart' as logger;
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -14,7 +12,6 @@ class ProductsTile extends StatelessWidget {
   Widget widget;
   @override 
   Widget build(BuildContext context) {
-    UserRepository user1 = Provider.of<UserRepository>(context);
     void navigateToProductdetail(Product pd, 
         ) async {
       Navigator.push(context, ScaleRoute(

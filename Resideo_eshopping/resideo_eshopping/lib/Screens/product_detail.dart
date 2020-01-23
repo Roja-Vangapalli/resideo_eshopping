@@ -98,7 +98,7 @@ class _ProductDetailState extends State<ProductDetail> {
 
   @override
   Widget build(BuildContext context) {
-    UserRepository user1 = Provider.of<UserRepository>(context);
+    UserRepository userRepository = Provider.of<UserRepository>(context);
     buttonDisabled =
         _productController.enableDisableOrderNowButton(widget.product.quantity);
     void navigateToCustomerAddress() async {
@@ -187,7 +187,7 @@ class _ProductDetailState extends State<ProductDetail> {
                       onPressed: buttonDisabled
                           ? null
                           : () {
-                        if (user1.user == null) {
+                        if (userRepository.user == null) {
                           // Navigator.pop(context);
                           // widget.online();
                           Navigator.of(context).push(
@@ -197,9 +197,9 @@ class _ProductDetailState extends State<ProductDetail> {
                                 );
                               }));
                           // Navigator.popAndPushNamed(context, 'OrderConfirmationPage');
-                        } else if (user1.userinfo == null ||
-                            user1.userInfo.address == null ||
-                            user1.userInfo.phone == null) {
+                        } else if (userRepository.userinfo == null ||
+                            userRepository.userInfo.address == null ||
+                            userRepository.userInfo.phone == null) {
                           showAlertDialog(context);
                         } else
                           navigateToCustomerAddress();
