@@ -183,8 +183,8 @@ class _LoginPageState extends State<LoginPage> with AfterLayoutMixin<LoginPage>{
                         setState(() {
                           if (userId != null) {
                             Navigator.of(context).pop();
-                            UserRepository user1 = Provider.of<UserRepository>(context);
-                           user1.getUserdetails();
+                            UserRepository userRepository = Provider.of<UserRepository>(context);
+                           userRepository.getUserdetails();
                             Flushbar(
                               message: "You are Signed in!",
                               duration: Duration(seconds: 3),

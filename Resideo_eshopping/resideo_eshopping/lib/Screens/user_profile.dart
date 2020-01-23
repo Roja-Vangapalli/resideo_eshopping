@@ -89,13 +89,13 @@ class _SignUpState extends State<SignUp>
   @override
      void initState() {
      super.initState();
-     UserRepository user1 = Provider.of<UserRepository>(context,listen: false);
+     UserRepository userRepository = Provider.of<UserRepository>(context,listen: false);
     _controler = AnimationController(
         vsync: this, duration: const Duration(microseconds: 500));
-    _initializeImagePicker(user1);
+    _initializeImagePicker(userRepository);
     firebaseDatabaseUtil = FirebaseDatabaseUtil();
     firebaseDatabaseUtil.initState();
-    _fillUserDetail(user1);
+    _fillUserDetail(userRepository);
     
     
   }
@@ -122,13 +122,13 @@ class _SignUpState extends State<SignUp>
   @override
   void didUpdateWidget(SignUp oldWidget) {
     super.didUpdateWidget(oldWidget);
-    UserRepository user1 = Provider.of<UserRepository>(context,listen: false);
-    _fillUserDetail(user1);
+    UserRepository userRepository = Provider.of<UserRepository>(context,listen: false);
+    _fillUserDetail(userRepository);
   }
 
   @override
   Widget build(BuildContext context) {
-    UserRepository user1 = Provider.of<UserRepository>(context);
+    UserRepository userRepository = Provider.of<UserRepository>(context);
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -145,7 +145,7 @@ class _SignUpState extends State<SignUp>
           autovalidate: true,
           child: Column(children: <Widget>[
             GestureDetector(
-              onTap: () {_initializeImagePicker(user1);imagePicker.showDialog(context);},
+              onTap: () {_initializeImagePicker(userRepository);imagePicker.showDialog(context);},
               child: (_imageUrl != null && _image == null)
                   ? new Center(
                       child: Column(
@@ -296,14 +296,14 @@ class _SignUpState extends State<SignUp>
                         final form = _formKeyValue.currentState;
                         if (form.validate()) {
                           form.save();
-                          user1.userInfo = User(
+                          userRepository.userInfo = User(
                               _nameController.text,
                               _phoneController.text,
                               _addressController.text,
                               _zipcodeController.text);
                           firebaseDatabaseUtil
                               .updateUserProfile(
-                                  user1.user, _image, user1.userinfo, _isEdit)
+                                  userRepository.user, _image, userRepository.userinfo, _isEdit)
                               .then((result) {
                             if (result) showAlertDialog(context);
                           });
